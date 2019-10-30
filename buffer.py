@@ -5,3 +5,5 @@ class buffer():
         self.data = []
         self.size = size
 
+    def add(self,trajectory , reward):
+        for t,r in self.data:
