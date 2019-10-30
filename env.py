@@ -1,13 +1,22 @@
+from time import sleep
+
 import numpy as np
+from threading import Thread as thread
+import gui as interface
 
 
 class treasure_hunter:
-    def __init__(self):
+    def __init__(self,render=True):
+        self.to_render = render
         self.map = np.zeros([10,10])
         self.pos = [0,0]
         self.action_space = 8
         self.observation_space = 2
         self.initialize()
+        if render == True:
+            self.gui = interface.gui()
+
+
     def reset(self):
         self.pos = [0,0]
         return np.asarray(self.pos)
@@ -25,6 +34,7 @@ class treasure_hunter:
         self.map[6,7] = 50
         self.map[8,8] = 74
         self.map[9,9] = 124
+
 
     def step(self, action):
         step_reward, treasure_reward = 0,0
@@ -69,24 +79,24 @@ class treasure_hunter:
         actions = [3,0,2,4,6,7,5,1,4,4,4]
         print("testing environment actions")
         for a in actions:
-            #print ("action taken " + str(a))
+            print ("action taken " + str(a))
             state, treas_reward , step_reward , done  =self.step(a)
-            #self.render()
+            self.render()
         assert done  and treas_reward == 3 ,  " expected episode to end on reward 3"
 
 
     def render(self):
+        if self.to_render:
+            map = np.copy(self.map)
+            map[self.pos[0], self.pos[1]] = -5
+            self.gui.create_grid(map)
+            self.gui.render()
         map = np.copy(self.map)
         map[self.pos[0],self.pos[1]] = -5
-        print(map)
+        #print(map)
 
 
 
 game = treasure_hunter()
-game.render()
+game.test()
 
-def generator()
-
-test_list = [9,2,4,6,6,7,9,5]
-
-print(str(sort(test_list)))
