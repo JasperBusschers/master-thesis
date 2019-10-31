@@ -12,3 +12,4 @@ class buffer():
             if pareto_dominates(reward1,reward2 , r1,r2):
                 dominated_set.append(self.data[i])
                 self.data.remove(self.data[i])
+
