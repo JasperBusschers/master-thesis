@@ -5,6 +5,8 @@ from threading import Thread as thread
 import gui as interface
 
 
+
+
 class treasure_hunter:
     def __init__(self,render=True):
         self.to_render = render

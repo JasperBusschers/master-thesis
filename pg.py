@@ -31,6 +31,25 @@ hidden_dim = 64
 BATCH_SIZE = 100
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+class classifier(nn.Module):
+    def __init__(self, input):
+        super(classifier, self).__init__()
+        self.optim = opt.Adam(self.parameters(),lr=1e-4)
+        self.hidden = 64
+        self.layer1 = nn.Linear(input, self.hidden)
+        self.layer2 = nn.Linear(self.hidden, self.hidden/2)
+        self.layer3 = nn.Linear(self.hidden/2, self.hidden/4)
+        self.layer4 = nn.Linear(self.hidden/4, self.hidden/8)
+        self.layer5 = nn.Linear(self.hidden/8,10)
+        self.dropout = nn.Dropout(p=0.5)
+
+    def forward(self, x):
+        x = F.relu(self.layer1(x))
+        x = F.relu(self.layer2(x))
+        x = F.relu(self.layer3(x))
+        x = F.relu(self.layer4(x))
+        x = F.relu(self.layer5(x))
+        return x
 
 
 class Model(nn.Module):
