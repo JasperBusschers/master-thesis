@@ -5,7 +5,7 @@ import numpy as np
 from tabularQL import tabularQL
 import cv2
 
-from util import chebychev
+from util import linear, chebychev
 
 
 def record_frame(self, episode, frames=None):
@@ -31,13 +31,10 @@ def main(args):
         total_reward = np.zeros([2])
         cumulative_reward = 0
         while not done:
-            if True:#args.render:
-                frame = env.render('rgb_array')
-                cv2.imshow('lol',frame)
             action = agent.act(state)
             next_state , rewards ,done , info =env.step(action)
             if args.scalarization_method == 'Linear':
-                reward = args.weight1 * rewards[0] + (1 - args.weight1) * rewards[1]
+                reward = linear(args,rewards)
             elif args.scalarization_method == 'Chebyshev':
                 reward = chebychev(args, rewards)
             agent.update(state, next_state, action, reward )
