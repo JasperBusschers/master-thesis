@@ -5,6 +5,8 @@ import numpy as np
 from tabularQL import tabularQL
 import cv2
 
+from util import chebychev
+
 
 def record_frame(self, episode, frames=None):
         frame = self.env.render('rgb_array')
@@ -37,7 +39,7 @@ def main(args):
             if args.scalarization_method == 'Linear':
                 reward = args.weight1 * rewards[0] + (1 - args.weight1) * rewards[1]
             elif args.scalarization_method == 'Chebyshev':
-                reward = args.weight1 * np.abs(rewards[0] - args.attraction1) + (1 - args.weight1) * np.abs(rewards[1] - args.attraction2)
+                reward = chebychev(args, rewards)
             agent.update(state, next_state, action, reward )
             state = next_state
             total_reward += np.asarray(rewards)
