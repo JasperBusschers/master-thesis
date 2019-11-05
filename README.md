@@ -5,7 +5,7 @@
 ## run tabular 
 Contains argparser for reviewing hyperparameters and running an experiment
 
-## QT agent
+## tabular QL
 Contains basic code for an tabular epsilon greedy policy
 
 ## util
