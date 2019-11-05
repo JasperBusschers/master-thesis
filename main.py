@@ -20,6 +20,7 @@ def record_frame(self, episode, frames=None):
             return np.append(frames, frame, axis=0)
 
 def main(args):
+
     env = gym.make(args.environment)
     agent = tabularQL(env.observation_space.n, env.action_space.n ,args)
     for e in range(args.episodes):
