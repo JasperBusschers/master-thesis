@@ -9,5 +9,5 @@ Contains argparser for reviewing hyperparameters and running an experiment
 Contains basic code for an tabular epsilon greedy policy
 
 ## util
-Contains coparison opperation for pareto dominate
+Contains coparison opperation for pareto dominate,    
 Contains scalarisation methods : Linear , chebychef
