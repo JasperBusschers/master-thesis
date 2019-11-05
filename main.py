@@ -31,13 +31,10 @@ def main(args):
         total_reward = np.zeros([2])
         cumulative_reward = 0
         while not done:
-            action = agent.act(state)
+            action , Qval= agent.act(state)
             next_state , rewards ,done , info =env.step(action)
-            if args.scalarization_method == 'Linear':
-                reward = linear(args,rewards)
-            elif args.scalarization_method == 'Chebyshev':
-                reward = chebychev(args, rewards)
-            agent.update(state, next_state, action, reward )
+
+            agent.update(state, next_state, action, rewards )
             state = next_state
             total_reward += np.asarray(rewards)
         if agent.eps > agent.min_eps:

@@ -1,5 +1,6 @@
 import numpy as np
 
+from util import linear, chebychev
 
 
 class tabularQL():
@@ -11,7 +12,7 @@ class tabularQL():
         self.gamma = args.gamma
         self.eps_decay = args.eps_decay
         self.args = args
-        self.Q = np.random.uniform(args.low , args.high ,[self.state_dim,action_dim])
+        self.Q = np.random.uniform(args.low , args.high ,[self.state_dim,action_dim,2])
         self.min_eps = args.min_eps
 
     def act(self, state):
@@ -19,8 +20,14 @@ class tabularQL():
         if random < self.eps:
             action = np.random.randint(self.action_dim)
         else:
-            action = np.argmax(self.Q[state])
-        return action
+            if self.args.scalarization_method == 'Linear':
+                qvals = [linear(self.args,q_vals) for q_vals in self.Q[state]]
+            elif self.args.scalarization_method == 'Chebyshev':
+                qvals = [chebychev(self.args,q_vals) for q_vals in self.Q[state]]
+            action = np.argmax(qvals)
+        return action , self.Q[state,action]
 
     def update(self, state, next_state, action ,reward):
-        self.Q[state,action] += self.lr * (reward + self.gamma * max(self.Q[next_state]) - self.Q[state,action])
+        reward1, reward2 = reward
+        self.Q[state,action,0] += self.lr * (reward1 + self.gamma * max(self.Q[next_state,:,0]) - self.Q[state,action,0])
+        self.Q[state, action, 1] += self.lr * (reward2 + self.gamma * max(self.Q[next_state, :, 1]) - self.Q[state, action,1])
