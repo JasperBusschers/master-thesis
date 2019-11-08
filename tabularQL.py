@@ -27,7 +27,16 @@ class tabularQL():
             action = np.argmax(qvals)
         return action , self.Q[state,action]
 
-    def update(self, state, next_state, action ,reward):
+    def update(self, state, next_state, action ,reward,done):
         reward1, reward2 = reward
-        self.Q[state,action,0] += self.lr * (reward1 + self.gamma * max(self.Q[next_state,:,0]) - self.Q[state,action,0])
-        self.Q[state, action, 1] += self.lr * (reward2 + self.gamma * max(self.Q[next_state, :, 1]) - self.Q[state, action,1])
+        if self.args.scalarization_method == 'Linear':
+            qvals = [linear(self.args, q_vals) for q_vals in self.Q[next_state]]
+        elif self.args.scalarization_method == 'Chebyshev':
+            qvals = [chebychev(self.args, q_vals) for q_vals in self.Q[next_state]]
+        best = np.argmax(qvals)
+        if not done:
+            self.Q[state,action,0] += self.lr * (reward1 + self.gamma * self.Q[next_state,best,0] - self.Q[state,action,0])
+            self.Q[state, action, 1] += self.lr * (reward2 + self.gamma * self.Q[next_state, best, 1] - self.Q[state, action,1])
+        else:
+            self.Q[state, action, 0] += self.lr * (reward1 - self.Q[state, action, 0])
+            self.Q[state, action, 1] += self.lr * (reward2 - self.Q[state, action, 1])

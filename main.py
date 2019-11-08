@@ -8,18 +8,6 @@ import cv2
 from util import linear, chebychev
 
 
-def record_frame(self, episode, frames=None):
-        frame = self.env.render('rgb_array')
-        w, h = frame.shape[:2]
-        r = h / w
-        w = np.minimum(w, 100)
-        h = int(r * w)
-        frame = cv2.resize(frame, (h, w))
-        frame = np.expand_dims(frame, axis=0)
-        if frames is None:
-            return frame
-        else:
-            return np.append(frames, frame, axis=0)
 
 def main(args):
 
@@ -34,7 +22,7 @@ def main(args):
             action , Qval= agent.act(state)
             next_state , rewards ,done , info =env.step(action)
 
-            agent.update(state, next_state, action, rewards )
+            agent.update(state, next_state, action, rewards ,done)
             state = next_state
             total_reward += np.asarray(rewards)
         if agent.eps > agent.min_eps:
