@@ -17,8 +17,8 @@ def arguments():
     parse.add_argument('--high', type=int, default=124, help='higher boundary for Q_val initialization')
     parse.add_argument('--low', type=int, default=0, help='lower boundary for Q_val initialization')
     #multi objective Parameters
-    parse.add_argument('--scalarization_method', type=str, default='Chebyshev',help='Linear , Chebyshev ')
-    parse.add_argument('--weight1', type=float, default=0.9, help='weight for objective 1')
+    parse.add_argument('--scalarization_method', type=str, default='Linear',help='Linear , Chebyshev ')
+    parse.add_argument('--weight1', type=float, default=1, help='weight for objective 1')
     parse.add_argument('--attraction1', type=float, default=124, help='attraction point1')
     parse.add_argument('--attraction2', type=float, default=19, help='attraction point2')
     args = parse.parse_args()
