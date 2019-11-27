@@ -3,16 +3,17 @@ import deep_sea_treasure
 from gym import wrappers
 import numpy as np
 
-from buffer import buffer
+from memory import Memory
 from tabularQL import tabularQL
 import cv2
 
 from util import linear, chebychev
-
+from visualizer import visualizer
 
 
 def main(args):
-    memory = buffer(10)
+    memory = Memory(1,20)
+    plotter = visualizer()
     env = gym.make(args.environment)
     agent = tabularQL(env.observation_space.n, env.action_space.n ,args)
     for e in range(args.episodes):
@@ -30,10 +31,13 @@ def main(args):
             total_reward += np.asarray(rewards)
         if agent.eps > agent.min_eps:
             agent.eps = agent.eps * agent.eps_decay
-        memory.add(trajectory,total_reward[0],total_reward[1])
-        print('rewards in buffer' + str(memory.get_rewards()))
+        memory.add(0,trajectory,total_reward[0],total_reward[1])
+        if not memory.empty(0):
+            print("10 state action pairs sampled"+str(memory.sample(10,0)))
+        print('rewards in buffer' + str(memory.get_rewards()[0]))
         print("episode " + str(e))
         print("total rewards " + str(total_reward))
         print("epsilon  " + str(agent.eps))
-
+        if e%args.plot_every == 0:
+            plotter.plot_pareto_front(memory,args.name +str(e))
 

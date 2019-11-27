@@ -1,5 +1,6 @@
 from util import pareto_dominates
-
+import numpy as np
+import random
 
 class buffer():
     def __init__(self,size):
@@ -30,3 +31,20 @@ class buffer():
             rewards.append( [r1, r2] )
         return rewards
 
+    def sample(self,policy,number_of_steps=2):
+        result = []
+        if policy == 'random':
+            idx = random.randint(0,len(self.data)-(1))
+            data = self.data[idx]
+            trajectory = data[0]
+            idx = random.randint(0,max(0,len(trajectory)-(1+number_of_steps)))
+            for i in range(number_of_steps):
+                if len(trajectory) > idx+i:
+                    sample = trajectory[idx+i]
+                else:
+                    sample = [-1,-1]
+                result.extend(sample)
+        return result
+
+    def empty(self):
+        return len(self.data)==0
