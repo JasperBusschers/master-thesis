@@ -40,4 +40,5 @@ def main(args):
         print("epsilon  " + str(agent.eps))
         if e%args.plot_every == 0:
             plotter.plot_pareto_front(memory,args.name +str(e))
+    plotter.make_gif(args.name)
 
