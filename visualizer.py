@@ -24,3 +24,12 @@ class visualizer():
             images.append(imageio.imread(filename))
         imageio.mimsave('plots/gifs/'+name+'.gif', images,format='GIF', duration=2)
 
+    def plot_rewards(self,rewards,name):
+        plt.plot(rewards)
+        plt.title(name)
+        plt.ylabel('reward')
+        plt.xlabel('episode')
+        filename = 'plots/' + name + '.png'
+        plt.savefig(filename)
+        plt.close()
+

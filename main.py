@@ -16,14 +16,14 @@ def main(args):
     plotter = visualizer()
     env = gym.make(args.environment)
     agent = tabularQL(env.observation_space.n, env.action_space.n ,args)
+    rewards_o1, rewards_o2 = [],[]
     for e in range(args.episodes):
         state = env.reset()
         trajectory = []
         done = False
         total_reward = np.zeros([2])
-        cumulative_reward = 0
         while not done:
-            action , Qval= agent.act(state)
+            action = agent.act(state)
             next_state , rewards ,done , info =env.step(action)
             trajectory.append([state,action])
             agent.update(state, next_state, action, rewards ,done)
@@ -38,7 +38,11 @@ def main(args):
         print("episode " + str(e))
         print("total rewards " + str(total_reward))
         print("epsilon  " + str(agent.eps))
+        rewards_o1.append(total_reward[0])
+        rewards_o2.append(total_reward[1])
         if e%args.plot_every == 0:
             plotter.plot_pareto_front(memory,args.name +str(e))
     plotter.make_gif(args.name)
+    plotter.plot_rewards(rewards_o1, args.name + str('-rewards-objective1'))
+    plotter.plot_rewards(rewards_o2, args.name + str('-rewards-objective2'))
 

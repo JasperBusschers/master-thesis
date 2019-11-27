@@ -25,7 +25,7 @@ class tabularQL():
             elif self.args.scalarization_method == 'Chebyshev':
                 qvals = [chebychev(self.args,q_vals) for q_vals in self.Q[state]]
             action = np.argmax(qvals)
-        return action , self.Q[state,action]
+        return action
 
     def update(self, state, next_state, action ,reward,done):
         reward1, reward2 = reward
