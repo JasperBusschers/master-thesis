@@ -8,7 +8,7 @@ def arguments():
     #parameters for environment
     parse.add_argument('--environment', type=str, default='deep-sea-treasure-v0',help='environment to use')
     parse.add_argument('--name', type=str, default='DST-SQL-cheby=[124,19]', help='name to use when saving plots')
-    parse.add_argument('--plot_every', type=int, default=100, help='amount of episodes')
+    parse.add_argument('--plot_every', type=int, default=100, help='how often to save plots')
     #parameters for Q agent
     parse.add_argument('--episodes', type=int, default=1000, help='amount of episodes')
     parse.add_argument('--lr', type=float, default=0.1, help='learning rate')
