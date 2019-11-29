@@ -3,46 +3,101 @@ import deep_sea_treasure
 from gym import wrappers
 import numpy as np
 
+from disc_module import discriminator_module
 from memory import Memory
-from tabularQL import tabularQL
+from SQL import tabularSQL
+from QL import tabularQL
 import cv2
 
 from util import linear, chebychev
 from visualizer import visualizer
 
 
-def main(args):
-    memory = Memory(1,20)
-    plotter = visualizer()
+def train_QL_agent(args):
     env = gym.make(args.environment)
-    agent = tabularQL(env.observation_space.n, env.action_space.n ,args)
-    rewards_o1, rewards_o2 = [],[]
+    agent = tabularSQL(env.observation_space.n, env.action_space.n, args)
     for e in range(args.episodes):
+        state = env.reset()
+        done = False
+        while not done:
+            action = agent.act(state)
+            next_state , rewards ,done , info =env.step(action)
+            agent.update(state, next_state, action, rewards ,done)
+            state = next_state
+    return agent
+
+def sample_policy(policy,memory,mem_idx,args):
+    env = gym.make(args.environment)
+    for e in range(500):
         state = env.reset()
         trajectory = []
         done = False
         total_reward = np.zeros([2])
         while not done:
-            action = agent.act(state)
+            action = policy.act(state)
             next_state , rewards ,done , info =env.step(action)
-            trajectory.append([state,action])
-            agent.update(state, next_state, action, rewards ,done)
-            state = next_state
+            trajectory.append([state, action])
             total_reward += np.asarray(rewards)
-        if agent.eps > agent.min_eps:
-            agent.eps = agent.eps * agent.eps_decay
-        memory.add(0,trajectory,total_reward[0],total_reward[1])
-        if not memory.empty(0):
-            print("10 state action pairs sampled"+str(memory.sample(10,0)))
-        print('rewards in buffer' + str(memory.get_rewards()[0]))
-        print("episode " + str(e))
-        print("total rewards " + str(total_reward))
-        print("epsilon  " + str(agent.eps))
+        memory.add_dom_buffer(mem_idx,trajectory,total_reward[0],total_reward[1])
+
+
+def train_with_disc(args, discriminators,memory,log= True):
+    rewards_o1, rewards_o2 = [], []
+    env = gym.make(args.environment)
+    if args.policy == "QL":
+        agent = tabularQL(env.observation_space.n, env.action_space.n, args)
+    for e in range(args.episodes):
+        total_reward = np.zeros([2])
+        sample = []
+        trajectory = []
+        state = env.reset()
+        done = False
+        while not done:
+            action = agent.act(state)
+            next_state, rewards, done, info = env.step(action)
+            reward = discriminators.get_reward([state,action],memory)
+            agent.update(state, next_state, action, reward, done)
+            total_reward += np.asarray(rewards)
+            state = next_state
+            trajectory.append([state, action])
+            if len(sample) < 2*args.number_of_steps:
+                sample.extend([state, action])
+            else:
+                memory.add_agent_experience(sample)
+                sample = []
+        memory.add_dom_buffer(2, trajectory, total_reward[0], total_reward[1])
+        if log:
+            print("----------------EPISODE " + str(e) + "----------------")
+            print('rewards in buffer' + str(memory.get_rewards()[2]))
+            print("episode " + str(e))
+            print("total rewards " + str(total_reward))
+            print("epsilon  " + str(agent.eps))
         rewards_o1.append(total_reward[0])
         rewards_o2.append(total_reward[1])
-        if e%args.plot_every == 0:
-            plotter.plot_pareto_front(memory,args.name +str(e))
-    plotter.make_gif(args.name)
-    plotter.plot_rewards(rewards_o1, args.name + str('-rewards-objective1'))
-    plotter.plot_rewards(rewards_o2, args.name + str('-rewards-objective2'))
+        # update discriminator
+        if memory.length_agent_buffer() >= args.batch_size:
+            discriminators.update(memory, 0, 0)
+            discriminators.update(memory, 1, 1)
+    return agent
+
+def main(args):
+    # step 1 train 2 extreme policies
+    policy1 = train_QL_agent(args)
+    args.weight1 = 1- args.weight1
+    policy2 = train_QL_agent(args)
+    memory = Memory(3,20,args)
+    # step 2 sample the policies in the buffer
+    sample_policy(policy1,memory,0,args)
+    sample_policy(policy2, memory, 1, args)
+    # step 3 train new policy using discriminators
+    discriminators = discriminator_module(args)
+    agent  = train_with_disc(args, discriminators,memory)
+    # visualize buffers for extreme policy and new policy
+    plotter = visualizer()
+    plotter.plot_pareto_front(memory, args.name + "extreme_pol")
+
+
+
+
+
 

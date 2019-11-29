@@ -2,7 +2,6 @@ import argparse
 
 from main import main
 
-
 environments = ['bountiful-sea-treasure-v0' , 'deep-sea-treasure-v0' ]
 strategy = ['Linear', 'Chebyshev']
 
@@ -26,11 +25,26 @@ def arguments(env,strat):
     parse.add_argument('--weight1', type=float, default=1, help='weight for objective 1')
     parse.add_argument('--attraction1', type=float, default=124, help='attraction point1')
     parse.add_argument('--attraction2', type=float, default=19, help='attraction point2')
+    #discriminator Parameters
+    parse.add_argument('--policy', type=str, default="QL", help='learning approach for policy')
+    parse.add_argument('--number_of_steps', type=int, default=1, help='how many state action pairs per sample')
+    parse.add_argument('--agent_buffer_size', type=int, default=100, help='how many states to keep in memeory')
+    parse.add_argument('--amount_of_disc', type=int, default=2, help='how many discriminators')
+    parse.add_argument('--batch_size', type=int, default=32, help='batch size for updating discriminator')
+    parse.add_argument('--disc_lr', type=float, default=0.005, help='learning rate discriminators')
     args = parse.parse_args()
     return args
 
+def run1():
+    for env in environments:
+        for strat in strategy:
+            args = arguments(env,strat)
+            main(args)
 
-for env in environments:
-    for strat in strategy:
+def run2():
+    for env in environments:
+        strat = 'Linear'
         args = arguments(env,strat)
         main(args)
+
+run2()

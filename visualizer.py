@@ -11,7 +11,7 @@ class visualizer():
         for i,  rewards in enumerate(memory.get_rewards()):
             x, y = zip(*rewards)
             plt.scatter(x, y)
-            plt.title(name)
+            plt.title(name+'_' +str(i))
             plt.xlabel("reward objective 1")
             plt.ylabel("reward objective 2")
             filename = 'plots/'+name+'_' +str(i)+'.png'

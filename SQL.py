@@ -3,7 +3,7 @@ import numpy as np
 from util import linear, chebychev
 
 
-class tabularQL():
+class tabularSQL():
     def __init__(self, state_dim, action_dim , args):
         self.state_dim = state_dim
         self.action_dim = action_dim
