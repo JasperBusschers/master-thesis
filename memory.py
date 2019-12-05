@@ -1,3 +1,5 @@
+import random
+
 from agent_buffer import Agent_buffer
 from buffer import buffer
 
@@ -15,11 +17,15 @@ class Memory(object):
     def add_dom_buffer(self,  idx, trajectory, reward1,reward2):
         self.buffers[idx].add(trajectory , reward1,reward2)
 
-    def sample_dom_buffer(self, amount, idx , policy= 'random'):
+    def sample_dom_buffer(self, amount, idx , policy= 'random', also_agent = False):
         samples = []
         for i in range(amount):
             if policy == 'random':
-                sample = self.buffers[idx].sample(policy,self.args.number_of_steps)
+                rand = random.random()
+                if rand > 0.5 and also_agent:
+                    sample = self.sample_experiences(1)[0]
+                else:
+                    sample = self.buffers[idx].sample(policy,self.args.number_of_steps)
                 samples.append(sample)
         return samples
 

@@ -8,9 +8,9 @@ import random
 class Discriminator(nn.Module):
     def __init__(self, state_dim, action_dim, args):
         super(Discriminator, self).__init__()
-        self.l1 = nn.Linear(state_dim +action_dim, 400)
-        self.l2 = nn.Linear(400, 300)
-        self.l3 = nn.Linear(300, 1)
+        self.l1 = nn.Linear(state_dim +action_dim, 24)
+        self.l2 = nn.Linear(24, 88)
+        self.l3 = nn.Linear(88, 1)
         self.optim_discriminator = torch.optim.Adam(self.parameters(), lr=args.disc_lr)
         self.loss_fn = nn.BCELoss()
         self.args = args
@@ -49,7 +49,7 @@ class discriminator_module():
 
     def update(self, memory , disc_index, memory_index):
         batch_size = self.args.batch_size
-        batch_expert = memory.sample_dom_buffer(batch_size,memory_index)
+        batch_expert = memory.sample_dom_buffer(batch_size,memory_index,also_agent=True)
         agent_batch = memory.sample_experiences(batch_size)
         batch_expert = torch.FloatTensor(batch_expert)
         agent_batch = torch.FloatTensor(agent_batch)
@@ -57,9 +57,16 @@ class discriminator_module():
         print ("discriminator loss = " + str(loss))
 
 
-    def get_reward(self,sample,memory):
+    def get_reward(self,sample,method):
         total = 0
         sample = torch.FloatTensor(sample)
-        for disc in self.discriminators:
-            total += disc(sample).item()
+        if method == 'sum':
+            for disc in self.discriminators:
+                total += disc(sample).item()
+        if method == 'logsum':
+            for disc in self.discriminators:
+                total += torch.log(1-disc(sample)).item()
+        if method == 'logsumdiff':
+            for disc in self.discriminators:
+                total += (torch.log(disc(sample)) - torch.log(1-disc(sample))).item()
         return total
