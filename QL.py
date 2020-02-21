@@ -29,3 +29,6 @@ class tabularQL():
             self.Q[state,action] += self.lr * (reward + self.gamma * self.Q[next_state,best] - self.Q[state,action])
         else:
             self.Q[state, action] += self.lr * (reward - self.Q[state, action])
+    def decay(self):
+        if self.eps > self.min_eps:
+            self.eps = self.eps * self.eps_decay

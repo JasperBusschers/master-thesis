@@ -46,6 +46,8 @@ class discriminator_module():
     def __init__(self, args):
         self.discriminators = [Discriminator(args.number_of_steps ,args.number_of_steps , args) for _ in range(args.amount_of_disc)]
         self.args = args
+        self.discriminator_losses = [[] for _ in range(args.amount_of_disc)]
+
 
     def update(self, memory , disc_index, memory_index):
         batch_size = self.args.batch_size
@@ -54,18 +56,23 @@ class discriminator_module():
         batch_expert = torch.FloatTensor(batch_expert)
         agent_batch = torch.FloatTensor(agent_batch)
         loss = self.discriminators[disc_index].update(batch_expert,agent_batch)
-        print ("discriminator loss = " + str(loss))
+        self.discriminator_losses[disc_index].append(loss)
 
+    def get_losses(self):
+        return self.discriminator_losses
 
-    def get_reward(self,sample,method):
+    def get_reward(self,sample,method,memory):
         total = 0
         sample = torch.FloatTensor(sample)
         if method == 'sum':
-            for disc in self.discriminators:
-                total += disc(sample).item()
+            batch_expert = memory.sample_dom_buffer(1, 1, also_agent=True)
+            batch_expert = torch.FloatTensor(batch_expert).view(-1)
+            for i, disc in enumerate(self.discriminators):
+                total += disc(sample).item() - disc(batch_expert).item()
+            #total = total-2
         if method == 'logsum':
             for disc in self.discriminators:
-                total += torch.log(1-disc(sample)).item()
+                total += torch.log(disc(sample)+0.3).item()
         if method == 'logsumdiff':
             for disc in self.discriminators:
                 total += (torch.log(disc(sample)) - torch.log(1-disc(sample))).item()

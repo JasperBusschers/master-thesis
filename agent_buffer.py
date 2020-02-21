@@ -18,3 +18,5 @@ class Agent_buffer():
 
     def length(self):
         return len(self.buffer)
+    def empty(self):
+        return len(self.buffer) == 0

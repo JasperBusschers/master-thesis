@@ -45,10 +45,10 @@ class PG_agent():
                 rewards[i] = running_add
 
         # Normalize reward
-        reward_mean = np.mean(rewards)
-        reward_std = np.std(rewards)
-        for i in range(len(states)):
-            rewards[i] = (rewards[i] - reward_mean) / reward_std
+        #reward_mean = np.mean(rewards)
+        #reward_std = np.std(rewards)
+        #for i in range(len(states)):
+        #    rewards[i] = (rewards[i] - reward_mean) / reward_std
 
         # Gradient Desent
         self.optimizer.zero_grad()

@@ -33,6 +33,8 @@ class tabularSQL():
             qvals = [linear(self.args, q_vals) for q_vals in self.Q[next_state]]
         elif self.args.scalarization_method == 'Chebyshev':
             qvals = [chebychev(self.args, q_vals) for q_vals in self.Q[next_state]]
+        else:
+            print("error: wrong scalarization method, "+self.args.scalarization_method+" not implemented ")
         best = np.argmax(qvals)
         if not done:
             self.Q[state,action,0] += self.lr * (reward1 + self.gamma * self.Q[next_state,best,0] - self.Q[state,action,0])
@@ -40,3 +42,7 @@ class tabularSQL():
         else:
             self.Q[state, action, 0] += self.lr * (reward1 - self.Q[state, action, 0])
             self.Q[state, action, 1] += self.lr * (reward2 - self.Q[state, action, 1])
+
+    def decay(self):
+        if self.eps > self.min_eps:
+            self.eps = self.eps * self.eps_decay

@@ -7,11 +7,20 @@ import imageio
 class visualizer():
     def __init__(self):
         self.file_names = []
-    def plot_pareto_front(self,memory, name):
+    def plot_pareto_front(self,memory, name, correct =[]):
         for i,  rewards in enumerate(memory.get_rewards()):
             x, y = zip(*rewards)
-            plt.scatter(x, y)
-            plt.title(name+'_' +str(i))
+            for X,Y in zip(x,y):
+                if [X,Y] in correct:
+                    color = 'green'
+                else:
+                    color = 'red'
+                axes = plt.gca()
+                axes.set_xlim([0, 130])
+                axes.set_ylim([0, -30])
+
+                plt.plot(X, Y, 'ro',color = color)
+            plt.title(name+'_' + str(i))
             plt.xlabel("reward objective 1")
             plt.ylabel("reward objective 2")
             filename = 'plots/'+name+'_' +str(i)+'.png'
@@ -33,3 +42,14 @@ class visualizer():
         plt.savefig(filename)
         plt.close()
 
+    def plot_losses(self, name, losses, extension = 'disc'):
+        for i,loss in enumerate(losses):
+            plt.plot(loss , label = 'disc '+ str(i))
+        plt.title(extension+'-' + str(i) )
+        plt.legend(loc='upper left')
+        plt.savefig('plots/'+name + '-'+extension + str(i) +'.png')
+    def distribution(self,data, name):
+        plt.hist(data, color='blue', edgecolor='black',)
+        filename = 'plots/' + name + '.png'
+        plt.savefig(filename)
+        plt.close()
