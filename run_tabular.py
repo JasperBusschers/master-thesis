@@ -57,4 +57,4 @@ def run2():
 
 
 args = arguments('deep-sea-treasure-v0','Chebyshev','logsum')
-run1('deep-sea-treasure-v0')
+test(args)

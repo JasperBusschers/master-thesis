@@ -71,8 +71,12 @@ class discriminator_module():
                 total += disc(sample).item() - disc(batch_expert).item()
             #total = total-2
         if method == 'logsum':
+            batch_expert = memory.sample_dom_buffer(1, 1, also_agent=True)
+            batch_expert = torch.FloatTensor(batch_expert).view(-1)
             for disc in self.discriminators:
-                total += torch.log(disc(sample)+0.3).item()
+                P_true=disc(batch_expert)
+                P_agent = disc(sample)
+                total += -P_true*torch.log(1-P_agent).item()
         if method == 'logsumdiff':
             for disc in self.discriminators:
                 total += (torch.log(disc(sample)) - torch.log(1-disc(sample))).item()
