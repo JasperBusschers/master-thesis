@@ -36,18 +36,29 @@ class buffer():
         if len(dominated_by)==0:
             if len(equal) == 0:
                 self.data.append([trajectory,reward1,reward2, 0])
+
             added = True
         return added, len(dominating), amount_visited
 
-    def search(self,state,action):
+    def search(self,state,action, index):
         found = False
+        amount = 0
+        times = 0
+        total = 0
         for i, sample in enumerate(self.data):
-            t, r1, r2,_ = sample
-            for s,a in t:
-                if s == state and a == action:
+            t, r1, r2,visited = sample
+            for i, [s,a]  in enumerate(t):
+                total += 1
+                v =visited + 1
+                if s == state and a == action :
                     found=True
-                    break
-        return found
+                    times += 1
+                    if  i == index:
+                        amount +=1/v
+                    else :
+                        amount += (1/np.abs(i-index) -0.5)/v
+
+        return found, amount
 
     def get_rewards(self):
         rewards = []
@@ -73,3 +84,9 @@ class buffer():
 
     def empty(self):
         return len(self.data)==0
+
+
+    def __sizeof__(self):
+        for i, sample in enumerate(self.data):
+            t, r1, r2,_ = sample
+        return len(self.data)

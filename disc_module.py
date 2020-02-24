@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import random
-
+import numpy as np
 
 
 class Discriminator(nn.Module):
@@ -61,9 +61,9 @@ class discriminator_module():
     def get_losses(self):
         return self.discriminator_losses
 
-    def get_reward(self,sample,method,memory):
+    def get_reward(self,Sample,method,memory, timestep):
         total = 0
-        sample = torch.FloatTensor(sample)
+        sample = torch.FloatTensor(Sample)
         if method == 'sum':
             batch_expert = memory.sample_dom_buffer(1, 1, also_agent=True)
             batch_expert = torch.FloatTensor(batch_expert).view(-1)
@@ -72,11 +72,12 @@ class discriminator_module():
             #total = total-2
         if method == 'logsum':
             batch_expert = memory.sample_dom_buffer(1, 1, also_agent=True)
-            batch_expert = torch.FloatTensor(batch_expert).view(-1)
+            batch_expert = torch.Tensor(batch_expert).view(-1)
             for disc in self.discriminators:
-                P_true=disc(batch_expert)
+                P_true =memory.search(Sample[0],Sample[1],timestep)
+                #disc(batch_expert)
                 P_agent = disc(sample)
-                total += -P_true*torch.log(1-P_agent).item()
+                total = P_true#P_true+P_agent-1).item()
         if method == 'logsumdiff':
             for disc in self.discriminators:
                 total += (torch.log(disc(sample)) - torch.log(1-disc(sample))).item()

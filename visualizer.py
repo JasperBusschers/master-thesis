@@ -44,12 +44,18 @@ class visualizer():
 
     def plot_losses(self, name, losses, extension = 'disc'):
         for i,loss in enumerate(losses):
-            plt.plot(loss , label = 'disc '+ str(i))
+            plt.plot(loss , label = extension+ str(i))
         plt.title(extension+'-' + str(i) )
         plt.legend(loc='upper left')
         plt.savefig('plots/'+name + '-'+extension + str(i) +'.png')
+        plt.close()
+
+    def plot_success_percentage(self, name, success, extension='percentage success'):
+        plt.plot(success , label = extension)
+        plt.title(extension+'-' )
+        plt.savefig('plots/'+name + '-'+extension  +'.png')
     def distribution(self,data, name):
-        plt.hist(data, color='blue', edgecolor='black',)
+        plt.hist(data, color='blue', edgecolor='black',width = 1)
         filename = 'plots/' + name + '.png'
         plt.savefig(filename)
         plt.close()

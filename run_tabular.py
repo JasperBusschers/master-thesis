@@ -12,15 +12,15 @@ def arguments(env,strat = 'Linear', method = 'logsum' , pol = 'QL'):
     parse.add_argument('--environment', type=str, default=env,help='environment to use')
     parse.add_argument('--name', type=str, default= env+"-"+strat+'-'+method+'-'+pol, help='name to use when saving plots')
     parse.add_argument('--plot_every', type=int, default=100, help='how often to save plots')
-    parse.add_argument('--log_every', type=int, default=1000, help='how often to log')
+    parse.add_argument('--log_every', type=int, default=10, help='how often to log')
     parse.add_argument('--log',   default=True, type=lambda x: (str(x).lower() == 'true'), help='whether to display console debugging output')
     parse.add_argument('--load_memory', default=True, type=lambda x: (str(x).lower() == 'true'),
                        help='whether to load buffer from memory')
     #parameters for Q agent
     parse.add_argument('--episodes', type=int, default=5000, help='amount of episodes')
     parse.add_argument('--lr', type=float, default=0.05, help='learning rate')
-    parse.add_argument('--eps', type=float, default=0.9, help='epsilon')
-    parse.add_argument('--min_eps', type=float, default=0.05, help='minimum value epsilon')
+    parse.add_argument('--eps', type=float, default=0.0, help='epsilon')
+    parse.add_argument('--min_eps', type=float, default=0.01, help='minimum value epsilon')
     parse.add_argument('--gamma', type=float, default=0.9, help='gamma')
     parse.add_argument('--eps_decay', type=float, default=0.999, help='epsilon decay')
     parse.add_argument('--high', type=int, default=124, help='higher boundary for Q_val initialization')
@@ -38,7 +38,7 @@ def arguments(env,strat = 'Linear', method = 'logsum' , pol = 'QL'):
     parse.add_argument('--agent_buffer_size', type=int, default=30, help='how many states to keep in memeory')
     parse.add_argument('--amount_of_disc', type=int, default=2, help='how many discriminators')
     parse.add_argument('--batch_size', type=int, default=10, help='batch size for updating discriminator')
-    parse.add_argument('--disc_lr', type=float, default=0.05, help='learning rate discriminators')
+    parse.add_argument('--disc_lr', type=float, default=0.005, help='learning rate discriminators')
     args = parse.parse_args()
     return args
 

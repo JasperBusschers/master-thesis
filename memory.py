@@ -2,7 +2,7 @@ import random
 
 from agent_buffer import Agent_buffer
 from buffer import buffer
-
+import numpy as np
 
 class Memory(object):
     def __init__(self,number_of_buffers,buffer_size,args):
@@ -23,11 +23,16 @@ class Memory(object):
     def add_agent_experience(self,sample):
         self.agent_buffer.add(sample)
 
-    def search(self,state,action):
-        reward = -10
-        for b in self.buffers:
-            if b.search(state,action):
-                reward =1
+    def search(self,state,action, index):
+        reward = 0
+        found = False
+        for b in [self.buffers[2]]:
+            in_buffer,visited =b.search(state,action, index)
+            if in_buffer:
+                found=True
+                reward =visited
+        if not found:
+            reward = -.5
 
         return  reward
 
@@ -54,6 +59,13 @@ class Memory(object):
             if len(rewards) != 0 :
                 result.append(rewards)
         return result
+
+    def __sizeof__(self):
+        size = 0
+        for buf in self.buffers:
+            size += buf.__sizeof__()
+        return size
+
 
     def empty(self,idx):
         return self.buffers[idx].empty()
